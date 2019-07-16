@@ -105,7 +105,7 @@ class SynthDataset():
             self.Xs.append(X)
         X_raw = np.concatenate(self.Xs)
         self.X = (X_raw - X_raw.mean(0)) / (X_raw.std(0))
-        print self.X.shape
+        print(self.X.shape)
         
         
     def next_batch(self, batch_size):
@@ -113,7 +113,31 @@ class SynthDataset():
         rand_idx = np.random.choice(range(self.N), size=(batch_size,), replace=False)
         return self.X[rand_idx]
 
+class OneDDataset():
+    
+    def __init__(self, x_dim=100, num_clusters=10, seed=1234):
+        
+        np.random.seed(seed)
+        
+        self.x_dim = x_dim
+        self.N = 10000
+        self.true_z_dim = 1
+        # generate synthetic data
+        self.Xs = []
+        for _ in xrange(num_clusters):
+            cluster_mean = np.random.randn(self.true_z_dim) * 5 # to make them more spread
+            A = np.random.randn(self.x_dim, self.true_z_dim) * 5
+            X = np.dot(np.random.randn(self.N / num_clusters, self.true_z_dim) + cluster_mean,
+                       A.T)
+            self.Xs.append(X)
+        X_raw = np.concatenate(self.Xs)
+        self.X = (X_raw - X_raw.mean(0)) / (X_raw.std(0))
+        prin(self.X.shape)
+        
+    def next_batch(self, batch_size):
 
+        rand_idx = np.random.choice(range(self.N), size=(batch_size,), replace=False)
+        return self.X[rand_idx]
 
         
 class MnistDataset():
@@ -337,7 +361,7 @@ class ImageNet():
         
     def supervised_batches(self, num_labeled, batch_size):
 
-        print "generating list of supervised examples"
+        print("generating list of supervised examples")
         dirnames = [dn for dn in os.listdir(os.path.join(self.path, "train_256")) if dn[0] == "n"]
         rand_imgs = []
         while len(rand_imgs) < num_labeled:
@@ -452,7 +476,7 @@ class Cifar10():
         self.labels = [] 
         for i in xrange(1, 6):
             batch_name = os.path.join(path, 'data_batch_%i' % i)
-            print batch_name
+            print(batch_name)
             images, labels = process_batch(batch_name)
             self.imgs.append(images)
             self.labels.append(labels)
@@ -463,7 +487,7 @@ class Cifar10():
         self.dataset_size = self.imgs.shape[0]
             
         test_batch_name = os.path.join(path, 'test_batch')
-        print test_batch_name
+        print(test_batch_name)
         self.test_imgs, self.test_labels = process_batch(test_batch_name)
         self.test_labels = one_hot_encoded(self.test_labels, len(self.class_names))
                 
